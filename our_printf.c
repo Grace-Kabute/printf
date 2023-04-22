@@ -24,10 +24,17 @@ int _printf(const char *format, ...)
 		else if (format[i + 1] == 's')
 		{
 			_print_str(va_arg(list, char *));
+			i++;
 		}
 		else if (format[i + 1] == '%')
 		{
 			_print_chr(format[i]);
+			i++;
+		}
+		else if (format[i + 1] == 'c')
+		{
+			_print_chr(va_arg(list, int));
+			i++;
 		}
 
 		counter++;
