@@ -243,7 +243,7 @@ int _print_binary(va_list typez, char *buffer, int flags, int width, int precisi
 }
 
 /**
- * _print_unsigned_num - printa positive number only(unsigned int)
+ * _print_unsigned_num - prints positive number only(unsigned int)
  * @typez: list a of arguments
  * @buffer: Buffer to handle print output
  * @flags: identify active flags
@@ -270,3 +270,44 @@ int _print_unsigned_num(va_list typez, char *buffer, int flags, int width, int p
 	 i++;
 	 return(write_unsigned(0, i, buffer, flags, width, precision, size));
 }
+
+
+/**
+ * _print_octal- prints base 8 numbers ( Octal)
+ * @typez: list a of arguments
+ * @buffer: Buffer to handle print output
+ * @flags: identify active flags
+ * @width: gives width of the character
+ * @precision: identify precisions
+ * @size: specify the size of the character
+ * Return: number of characters printed
+ */
+int _print_octal(va_list typez, char *buffer, int flags, int width, int precision, int size)
+{
+	int i = BUFFER_SIZE - 2;
+	unsigned long int number = va_arg(typez, unsigned long int);
+	unsigned long int_number = number;
+
+	UNUSED(width);
+
+	number = convert_size_unsigned(number, size);
+
+	if (number == 0)
+		buffer[i--] = '0';
+
+	buffer[BUFFER_SIZE - 1] = '\0';
+
+	while(number > 0)
+	{
+		buffer[i--] = (number % 8) + '0';
+		number = number / 8;
+	}
+	
+	if (flag  &F_HASH && int_number != 0)
+		buffer[i--] = '0';
+	i++;
+
+	return (write_unsigned(0, i, buffer, flags, width, precision, size));
+}
+
+
