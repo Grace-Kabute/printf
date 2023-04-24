@@ -340,3 +340,42 @@ int _print_hexa_capital(va_list typez, char *buffer, int flags, int width, int p
 	return (print_hexa(typez, "0123456789ABCDEF", buffer, flags, 'x', width, precision, size));
 }
 
+/**
+ * _print_any_hexa - prints out hexa decimal number in uppercase or lowercase
+ * @typez: list a of arguments
+ * @map_to: pointer to map the number to
+ * @buffer: Buffer to handle print output
+ * @flags: identify active flags
+ * @flag_ch: computes active flags
+ * @width: gives width of the character
+ * @precision: identify precisions
+ * @size: specify the size of the character
+ * Return: number of characters printed
+ */
+int _print_any_hexa(va_list typez, char *map_to, char *buffer, int flags, char flag_ch, int width, int precision, int size)
+{
+	int i = BUFF_SIZE - 2;
+	unsigned long int num = va_arg(typez, unsigned long int);
+	unsigned long int init_number = number;
+
+	UNUSED(width);
+
+	number = convert_unsigned(number, size);
+	if (number == 0)
+		buffer[i--] = '0';
+	buffer[BUFFER_SIZE - 1] = '\0';
+
+	while (number > 0)
+	{
+		buffer[i--] = map_to[number % 16];
+		number = number / 16;
+	}
+	if (flags &F_HASH && init_number != 0)
+	{
+		buffer[i--] = flag_ch;
+		buffer[i--] = '0';
+	}
+
+	i++;
+	return (write_unsigned(0, i, buffer, flags, width, precision, size));
+}

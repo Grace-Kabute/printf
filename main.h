@@ -25,6 +25,7 @@ int _print_unsigned_num(va_list typez, char *buffer, int flags, int width, int p
 int _print_octal(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int _print_hexa_decimals(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int _print_hexa_capital(va_list typez, char *buffer, int flags, int width, int precision, int size);
+int _print_any_hexa(va_list typez, char *map_to, char *buffer, int flags, char flag_ch, int width, int precision, int size);
 int _print_handler(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int handle_write_chr(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int handle_number(va_list typez, char *buffer, int flags, int width, int precision, int size);
