@@ -323,3 +323,20 @@ int _print_hexa_decimals(va_list typez, char *buffer, int flags, int width, int 
 {
 	return (print_hexa(typez, "0123456789abcef", buffer, flags, 'x', width, precision, size));
 }
+
+/**
+ * _print_hexa_capital - prints out hexa decimal number in uppercase
+ * @typez: list a of arguments
+ * @buffer: Buffer to handle print output
+ * @flags: identify active flags
+ * @width: gives width of the character
+ * @precision: identify precisions
+ * @size: specify the size of the character
+ * Return: number of characters printed
+ */
+int _print_hexa_capital(va_list typez, char *buffer, int flags, int width, int precision, int size)
+{
+
+	return (print_hexa(typez, "0123456789ABCDEF", buffer, flags, 'x', width, precision, size));
+}
+
