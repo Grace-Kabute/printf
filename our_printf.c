@@ -69,67 +69,94 @@ int _print_chr(char q)
 	return (1);
 }
 /**
-* _print_char - Prints a character
-* @types: List a of arguments passed
-* @buffer: Buffer array to handle our output
-* @flags: identifies the active flags
-* @width: Width of character
-* @precision: specifies precision
-* @size: specifies the size
-* Return: Number of characters passed
-*/
-int _print_char(va_list types, char buffer[],int flags, int width, int precision, int size)
+ * _print_char - print a character 
+ * @typez: list a of arguments
+ * @buffer: Buffer to handle print output
+ * @flags: identify active flags
+ * @width: gives width of the character
+ * @precision: identify precisions
+ * @size: specify the size of the character
+ * Return: Number of characters printed
+ */
+int _print_char(va_list typez, char *buffer, int flags, int width, int precision, int size)
 {
-	char q = va_arg(types, int);
-	return (handle_write_char(c, buffer, flags, width, precision, size));
+ char q	= va_arg(typez, int);
+
+ return (handle_write_char(q, buffer, flags, width, precision, size));
 }
 /**
-* _print_str - prints out a string
-* @types: List a of arguments passed
-* @buffer: Buffer array to handle our output
-* @flags: identifies the active flags
-* @width: Width of character
-* @precision: specifies precision
-* @size: specifies the size
-* Return: lenght of string
+ * _print_string - print out string output
+ * @typez: list a of arguments
+ * @buffer: Buffer to handle print output
+ * @flags: identify active flags
+ * @width: gives width of the character
+ * @precision: identify precisions
+ * @size: specify the size of the character
+ * Return: lenght of string
  */
-int _print_str(va_list types, char buffer[],int flags, int width, int precision, int size)
+int _print_string(va_list typez, char *buffer, int flags, int width, int precision, int size)
 {
-	int len, counter;
-	char *string = va_arg(types, char *);
-	
+	int len = 0, i;
+	char *string = va-arg(typez, char *);
+
 	UNUSED(buffer);
 	UNUSED(flags);
 	UNUSED(width);
-	UNSED(precision);
+	UNUSED(precision);
 	UNUSED(size);
-	if(str == NULL)
+
+	if (string == NULL)
 	{
 		string = "(null)";
 		if (precision >= 6)
-			string =" ";
+			string = " ";
 	}
 	while (string[len] != '\0')
 		len++;
-	if (precision >= 0 && precison < len)
+	if (precision >= 0 && precision < len)
 		len = precision;
-	if (width > len )
+	if (width > len)
 	{
-		if (flag & F_MINUS)
+		if (flags &F_MINUS)
 		{
-			write(1, &string, len;
-			for (i = width -len; i > 0; i--)
-			write(1,"", 1);
-			
+			write(1, &string, len);
+
+			for (i = width - len; i > 0; i--)
+				write(1, " ", 1);
 			return (width);
-			}
-			else
-			{
-			for (i = width -len; i > 0; i--)
-			write(1,"",1);
+		}
+		else
+		{
+			for (i = width - len; i > 0; i--)
+				write(1, " ", 1);
 			write(1, &string, len);
 			return (width);
-			}
-			}
-			return (write(1, string, len));
-			}
+		}
+	}
+	return (write(1, string, len));
+}
+
+
+	return (counter);
+}
+
+/**
+ * _print_percent - print out the % sign
+ * @typez: list a of arguments
+ * @buffer: Buffer to handle print output
+ * @flags: identify active flags
+ * @width: gives width of the character
+ * @precision: identify precisions
+ * @size: specify the size of the character
+ * Return: lenght of strin
+ */
+int _print_percent(va_list typez, char *buffer, int flags, int width, int precision, int size)
+{
+	UNUSED(buffer);
+	UNUSED(flags);
+	UNUSED(width);
+	UNUSED(precision);
+	UNUSED(size);
+
+	return (write(1, "%%", 1));
+}
