@@ -32,7 +32,7 @@ int handle_write_character(char c, char *buffer, int flags, int width, int preci
 int _print_hexa_decimals(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int _print_hexa_capital(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int _print_any_hexa(va_list typez, char *map_to, char *buffer, int flags, char flag_ch, int width, int precision, int size);
-int write_number(int a_negative, int ind, char *buffer,int flags, int width, int precision, int size);
+int write_number(int a_negative, int ind, char *buffer, int flags, int width, int precision, int size);
 int get_the_flag(const char *format, int *i);
 int get_the_width(const char *format, int *i, va_list list);
 int get_the_precision(const char *format, int *i, va_list list);
@@ -44,7 +44,7 @@ int write_a_number(int ind, char *buffer, int flags, int width, int precision, i
 int write_pointer(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int unsigned_number(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int is_digit(char c);
-int handle_print(const char *format, int *ind, va_list list, char *buffer,int flags, int width, int precision, int size);
+int handle_print(const char *format, int *ind, va_list list, char *buffer, int flags, int width, int precision, int size);
 
 /**
 * struct format - Struct op
@@ -66,7 +66,7 @@ struct format
 typedef struct format format_t;
 
 int _printf(const char *format, ...);
-int handle_print(const char *format, int *i,va_list list, char *buffer, int flags, int width, int precision, int size);
+int handle_print(const char *format, int *i, va_list list, char *buffer, int flags, int width, int precision, int size);
 
 
 #endif /*HEADER*/
