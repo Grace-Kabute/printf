@@ -8,7 +8,8 @@
 int _printf(const char *format, ...)
 {
 	int i, counter, output = 0;
-	int flagz, width, precision, size, buffer_index = 0; 
+	int flags, width, precision, size, buffer_index = 0;
+	char buffer[BUFFER_SIZE];
 
 	va_list list;
 
@@ -32,10 +33,10 @@ int _printf(const char *format, ...)
 		else
 		{
 			print_buffer(buffer, &buffer_index);
-			flags = get_flags(format, &i);
-			width = get_width(format, &i, list);
-			precision = get_precision(format, &i);
-			size = get_size(format, &i);
+			flags = get_the_flag(format, &i);
+			width = get_the_width(format, &i, list);
+			precision = get_the_precision(format, &i, list);
+			size = get_the_size(format, &i);
 			++i;
 			output = handle_print(format, &i, list, buffer, flags, width, precision, size);
 			if (output == -1)
@@ -52,7 +53,7 @@ int _printf(const char *format, ...)
  * @buffer: pointer to string
  * @buffer_index: index to store curret character format[i]
  */
- void print_buffer(char *buffer, *buffer_index)
+ void print_buffer(char *buffer, int *buffer_index)
 {
 	if (*buffer_index > 0)
 		write(1, &buffer, *buffer_index);
@@ -82,7 +83,7 @@ int _print_char(va_list typez, char *buffer, int flags, int width, int precision
 {
  char q	= va_arg(typez, int);
 
- return (handle_write_char(q, buffer, flags, width, precision, size));
+ return (handle_write_character(q, buffer, flags, width, precision, size));
 }
 /**
  * _print_string - print out string output
@@ -97,7 +98,7 @@ int _print_char(va_list typez, char *buffer, int flags, int width, int precision
 int _print_string(va_list typez, char *buffer, int flags, int width, int precision, int size)
 {
 	int len = 0, i;
-	char *string = va-arg(typez, char *);
+	char *string = va_arg(typez, char *);
 
 	UNUSED(buffer);
 	UNUSED(flags);
@@ -136,10 +137,6 @@ int _print_string(va_list typez, char *buffer, int flags, int width, int precisi
 	return (write(1, string, len));
 }
 
-
-	return (counter);
-}
-
 /**
  * _print_percent - print out the % sign
  * @typez: list a of arguments
@@ -152,6 +149,7 @@ int _print_string(va_list typez, char *buffer, int flags, int width, int precisi
  */
 int _print_percent(va_list typez, char *buffer, int flags, int width, int precision, int size)
 {
+	UNUSED(typez);
 	UNUSED(buffer);
 	UNUSED(flags);
 	UNUSED(width);
@@ -175,7 +173,7 @@ int _print_number(va_list typez, char *buffer, int flags, int width, int precisi
 	int i = BUFFER_SIZE - 2;
 	int a_negative = 0;
 	long int n = va_arg(typez, long int);
-	unsignes long int number;
+	unsigned long int number;
 
 	n = convert_size_number(n, size);
 
@@ -188,10 +186,10 @@ int _print_number(va_list typez, char *buffer, int flags, int width, int precisi
 		number = (unsigned long int)((-1) * n);
 		a_negative = 1;
 	}
-	while (num > 0)
+	while (number > 0)
 	{
 		buffer[i--] = (number % 10) + '0';
-		num /= 10;
+		number = number  / 10;
 	}
 	i++;
 	return (write_number(a_negative, i, buffer, flags, width, precision, size));
@@ -221,7 +219,7 @@ int _print_binary(va_list typez, char *buffer, int flags, int width, int precisi
 
 
 	n = va_arg(typez, unsigned int);
-	n = 2147483648;
+	m = 2147483648;
 
 	a[0] = n / m;
 	for (i = 1; i < 32; i++)
@@ -229,7 +227,7 @@ int _print_binary(va_list typez, char *buffer, int flags, int width, int precisi
 		 m = m / 2;
 		 a[i] = (n / m) % 2;
 	}
-	for (i = 0, sum = 0, counnter = 0; i < 32; i++)
+	for (i = 0, sum = 0, counter = 0; i < 32; i++)
 	{
 		sum = sum + a[i];
 		if (sum || i == 31)
@@ -257,7 +255,7 @@ int _print_unsigned_num(va_list typez, char *buffer, int flags, int width, int p
 	int i = BUFFER_SIZE - 2;
 	unsigned long int number = va_arg(typez, unsigned long int);
 
-	num = convert_size_unsigned(number, size);
+	number = convert_size_unsigned(number, size);
 
 	 if (number == 0)
 		 buffer[i--] = '0';
@@ -303,7 +301,7 @@ int _print_octal(va_list typez, char *buffer, int flags, int width, int precisio
 		number = number / 8;
 	}
 	
-	if (flag  &F_HASH && int_number != 0)
+	if (flags  &F_HASH && int_number != 0)
 		buffer[i--] = '0';
 	i++;
 
@@ -321,7 +319,7 @@ int _print_octal(va_list typez, char *buffer, int flags, int width, int precisio
  */
 int _print_hexa_decimals(va_list typez, char *buffer, int flags, int width, int precision, int size)
 {
-	return (print_hexa(typez, "0123456789abcef", buffer, flags, 'x', width, precision, size));
+	return (_print_any_hexa(typez, "0123456789abcef", buffer, flags, 'x', width, precision, size));
 }
 
 /**
@@ -337,7 +335,19 @@ int _print_hexa_decimals(va_list typez, char *buffer, int flags, int width, int 
 int _print_hexa_capital(va_list typez, char *buffer, int flags, int width, int precision, int size)
 {
 
-	return (print_hexa(typez, "0123456789ABCDEF", buffer, flags, 'x', width, precision, size));
+	return (_print_any_hexa(typez, "0123456789ABCDEF", buffer, flags, 'x', width, precision, size));
+}
+
+/**
+* is_digit - Verifies if a char is a digit
+* @c: Char to be evaluated
+* Return: 1 if c is a digit, 0 otherwise
+*/
+int is_digit(char c)
+{
+	if (c >= '0' && c <= '9')
+		return (1);
+	return (0);
 }
 
 /**
@@ -354,13 +364,13 @@ int _print_hexa_capital(va_list typez, char *buffer, int flags, int width, int p
  */
 int _print_any_hexa(va_list typez, char *map_to, char *buffer, int flags, char flag_ch, int width, int precision, int size)
 {
-	int i = BUFF_SIZE - 2;
-	unsigned long int num = va_arg(typez, unsigned long int);
+	int i = BUFFER_SIZE - 2;
+	unsigned long int number = va_arg(typez, unsigned long int);
 	unsigned long int init_number = number;
 
 	UNUSED(width);
 
-	number = convert_unsigned(number, size);
+	number = convert_size_unsigned(number, size);
 	if (number == 0)
 		buffer[i--] = '0';
 	buffer[BUFFER_SIZE - 1] = '\0';
@@ -378,4 +388,324 @@ int _print_any_hexa(va_list typez, char *map_to, char *buffer, int flags, char f
 
 	i++;
 	return (write_unsigned(0, i, buffer, flags, width, precision, size));
+}
+/**
+* get_the_flag - Computes  active flags
+* @format: Formatted string in which to print the arguments
+* @i: take a parameter.
+* Return: the Flag:
+*/
+int get_the_flag(const char *format, int *i)
+{
+	int j, curr_i;
+	int flags = 0;
+	const char FLAGS_CHARACTER[] = {'-', '+', '0', '#', ' ', '\0'};
+	const int FLAGS_ARRAY[] = {F_MINUS, F_PLUS, F_ZERO, F_HASH, F_SPACE, 0};
+
+	for (curr_i = *i + 1; format[curr_i] != '\0'; curr_i++)
+	{
+	for (j = 0; FLAGS_CHARACTER[j] != '\0'; j++)
+		if (format[curr_i] == FLAGS_CHARACTER[j])
+		{
+			flags |= FLAGS_ARRAY[j];
+			break;
+		}
+	if (FLAGS_CHARACTER[j] == 0)
+		break;
+	}
+	*i = curr_i - 1;
+	return (flags);
+}
+
+/**
+* get_the_precision - Computes the precision for printing
+* @format: Formatted string in which to print the arguments
+* @i: List of arguments to be printed.
+* @list: list of arguments.
+* Return: Precision.
+*/
+int get_the_precision(const char *format, int *i, va_list list)
+{
+	int curr_i = *i + 1;
+	int precision = -1;
+
+
+	if (format[curr_i] != '.')
+		return (precision);
+	precision = 0;
+
+	for (curr_i += 1; format[curr_i] != '\0'; curr_i++)
+	{
+		if (is_digit(format[curr_i]))
+		{
+			precision = precision * 10;
+			precision = precision + format[curr_i] - '0';
+		}
+		else if (format[curr_i] == '*')
+		{
+			curr_i++;
+			precision = va_arg(list, int);
+			break;
+		}
+		else
+			break;
+	}
+	*i = curr_i - 1;
+	return (precision);
+}
+
+/**
+* get_the_size - Computes the size to cast the argument
+* @format: Formatted string in which to print the arguments
+* @i: List of arguments to be printed.
+* Return: Precision.
+*/
+int get_the_size(const char *format, int *i)
+{
+	int curr_i = *i + 1;
+	int size = 0;
+
+	if (format[curr_i] == 'l')
+		size = S_LONG;
+	else if (format[curr_i] == 'h')
+		size = S_SHORT;
+	if (size == 0)
+		*i = curr_i - 1;
+	else
+		*i = curr_i;
+	return (size);
+
+}
+
+/**
+* get_the_width - Computes the width for printing
+* @format: Formatted string in which to print the arguments.
+* @i: List of arguments to be printed.
+* @list: list of arguments.
+* Return: width.
+*/
+int get_the_width(const char *format, int *i, va_list list)
+{
+	int curr_i;
+	int width = 0;
+
+	for (curr_i = *i + 1; format[curr_i] != '\0'; curr_i++)
+	{
+		if (is_digit(format[curr_i]))
+		{
+			width = width * 10;
+			width = width + format[curr_i] - '0';
+		}
+		else if (format[curr_i] == '*')
+		{
+			curr_i++;
+			width = va_arg(list, int);
+			break;
+		}
+		else
+			break;
+	}
+	*i = curr_i - 1;
+	return (width);
+}
+
+/**
+* handle_write_character - Prints a string
+* @c: char types.
+* @buffer: Buffer array to handle print
+* @flags: Calculates active flags.
+* @width: get width.
+* @precision: precision specifier
+* @size: Size specifier
+* Return: Number of chars printed.
+*/
+int handle_write_character(char c, char *buffer,int flags, int width, int precision, int size)
+{
+	int i = 0;
+	char padd = ' ';
+
+	UNUSED(precision);
+	UNUSED(size);
+
+	if (flags & F_ZERO)
+		padd = '0';
+	buffer[i++] = c;
+	buffer[i] = '\0';
+	if (width > 1)
+	{
+		buffer[BUFFER_SIZE - 1] = '\0';
+		for (i = 0; i < width - 1; i++)
+			buffer[BUFFER_SIZE - i - 2] = padd;
+		if (flags & F_MINUS)
+			return (write(1, &buffer[0], 1) +
+					write(1, &buffer[BUFFER_SIZE - i - 1], width - 1));
+		else
+			return (write(1, &buffer[BUFFER_SIZE - i - 1], width - 1) +
+					write(1, &buffer, 1));
+	}
+	return (write(1, &buffer, 1));
+}
+
+/**
+* convert_size_number - Casts a number to the specified size
+* @num: Number to be casted.
+* @size: Number indicating the type to be casted.
+* Return: Casted value of num
+*/
+long int convert_size_number(long int num, int size)
+{
+	if (size == S_LONG)
+		return (num);
+	else if (size == S_SHORT)
+		return ((short)num);
+	return ((int)num);
+}
+
+/**
+* convert_size_unsigned - Casts a number to the specified size
+* @num: Number to be casted
+* @size: Number indicating the type to be casted
+* Return: Casted value of num
+*/
+long int convert_size_unsigned(unsigned long int number, int size)
+{
+	if (size == S_LONG)
+		return (number);
+	else if (size == S_SHORT)
+		return ((unsigned short)number);
+	return ((unsigned int)number);
+}
+/**
+* write_number - Prints a string
+* @is_negative: Lista of arguments
+* @ind: char types.
+* @buffer: Buffer array to handle print
+* @flags: Calculates active flags
+* @width: get width.
+* @precision: precision specifier
+* @size: Size specifier
+* Return: Number of chars printed.
+*/
+int write_number(int a_negative, int ind, char *buffer,int flags, int width, int precision, int size)
+{
+	int length = BUFFER_SIZE - ind - 1;
+	char padd = ' ', extra_character = 0;
+
+	UNUSED(size);
+	if ((flags & F_ZERO) && !(flags & F_MINUS))
+		padd = '0';
+	if (a_negative)
+		extra_character = '-';
+	else if (flags & F_PLUS)
+		extra_character = '+';
+	else if (flags & F_SPACE)
+		extra_character = ' ';
+	return (write_a_number(ind, buffer, flags, width, precision,length, padd, extra_character));
+}
+
+
+/**
+* write_a_number - Write a number using a bufffer
+* @ind: Index at which the number starts on the buffer
+* @buffer: Buffer
+* @flags: Flags
+* @width: width
+* @prec: Precision specifier
+* @length: Number length
+* @padd: Pading char
+* @extra_character: Extra char
+* Return: Number of printed chars.
+*/
+int write_num(int ind, char *buffer,int flags, int width, int prec,int length, char padd, char extra_character)
+{
+	int i, padd_start = 1;
+
+	if (prec == 0 && ind == BUFFER_SIZE - 2 && buffer[ind] == '0' && width == 0)
+		return (0);
+	if (prec == 0 && ind == BUFFER_SIZE - 2 && buffer[ind] == '0')
+		buffer[ind] = padd = ' ';
+
+	if (prec > 0 && prec < length)
+		padd = ' ';
+	while (prec > length)
+		buffer[--ind] = '0', length++;
+
+	if (extra_character != 0)
+		length++;
+	if (width > length)
+	{
+		for (i = 1; i < width - length + 1; i++)
+			buffer[i] = padd;
+		buffer[i] = '\0';
+
+		if (flags & F_MINUS && padd == ' ')
+		{
+			if (extra_character)
+				buffer[--ind] = extra_character;
+			return (write(1, &buffer[ind], length) + write(1, &buffer[1], i - 1));
+		}
+		else if (!(flags & F_MINUS) && padd == ' ')
+		{
+			if (extra_character)
+				buffer[--ind] = extra_character;
+			return (write(1, &buffer[1], i - 1) + write(1, &buffer[ind], length));
+		}
+		else if (!(flags & F_MINUS) && padd == '0')
+		{
+			if (extra_character)
+				buffer[--padd_start] = extra_character;
+
+			return (write(1, &buffer[padd_start], i - padd_start) + write(1, &buffer[ind], length - (1 - padd_start)));
+		}
+	}
+	if (extra_character)
+		buffer[--ind] = extra_character;
+
+	return (write(1, &buffer[ind], length));
+}
+/**
+* write_unsigned - Writes an unsigned number
+* @a_negative: Number indicating if the num is negative
+* @ind: Index at which the number starts in the buffer
+* @buffer: Array of chars
+* @flags: Flags specifiers
+* @width: Width specifier
+* @precision: Precision specifier
+* @size: Size specifier
+* Return: Number of written chars.
+*/
+int write_unsigned(int a_negative, int ind,char *buffer,int flags, int width, int precision, int size)
+{
+	int length = BUFFER_SIZE - ind - 1, i = 0;
+	char padd = ' ';
+
+	UNUSED(a_negative);
+	UNUSED(size);
+
+	if (precision == 0 && ind == BUFFER_SIZE - 2 && buffer[ind] == '0')
+		return (0);
+	if (precision > 0 && precision < length)
+		padd = ' ';
+	while (precision > length)
+	{
+		buffer[--ind] = '0';
+		length++;
+	}
+	if ((flags & F_ZERO) && !(flags & F_MINUS))
+		padd = '0';
+	if (width > length)
+	{
+		for (i = 0; i < width - length; i++)
+			buffer[i] = padd;
+		buffer[i] = '\0';
+		if (flags & F_MINUS)
+		{
+			return (write(1, &buffer[ind], length) + write(1, &buffer, i));
+		}
+		else
+		{
+			return (write(1, &buffer[0], i) + write(1, &buffer[ind], length));
+		}
+	}
+	return (write(1, &buffer[ind], length));
 }
