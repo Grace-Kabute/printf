@@ -38,7 +38,8 @@ int _printf(const char *format, ...)
 			precision = get_the_precision(format, &i, list);
 			size = get_the_size(format, &i);
 			++i;
-			output = handle_print(format, &i, list, buffer, flags, width, precision, size);
+			output = handle_print(format, &i, list, buffer,
+					flags, width, precision, size);
 			if (output == -1)
 				return (-1);
 			counter += output;
@@ -263,15 +264,15 @@ int flags, int width, int precision, int size)
 	number = convert_size_unsigned(number, size);
 
 	if (number == 0)
-		 buffer[i--] = '0';
+		buffer[i--] = '0';
 	 buffer[BUFFER_SIZE - 1] = '\0';
-	 while (number > 0)
-	 {
+	while (number > 0)
+	{
 		 buffer[i--] = (number % 10) + '0';
 		 number = number / 10;
-	 }
+	}
 	 i++;
-	 return (write_unsigned(0, i, buffer, flags, width, precision, size));
+	return (write_unsigned(0, i, buffer, flags, width, precision, size));
 }
 
 
@@ -326,9 +327,9 @@ int flags, int width, int precision, int size)
 int _print_hexa_decimals(va_list typez, char *buffer,
 int flags, int width, int precision, int size)
 {
-	return (_print_any_hexa(typez, "0123456789abcef", buffer, flags, 'x', width, precision, size));
+	return (_print_any_hexa(typez, "0123456789abcef", buffer,
+				flags, 'x', width, precision, size));
 }
-
 /**
  * _print_hexa_capital - prints out hexa decimal number in uppercase
  * @typez: list a of arguments
@@ -343,9 +344,9 @@ int _print_hexa_capital(va_list typez, char *buffer,
 int flags, int width, int precision, int size)
 {
 
-	return (_print_any_hexa(typez, "0123456789ABCDEF", buffer, flags, 'x', width, precision, size));
+	return (_print_any_hexa(typez, "0123456789ABCDEF", buffer,
+				flags, 'x', width, precision, size));
 }
-
 /**
 * is_digit - Verifies if a char is a digit
 * @c: Char to be evaluated
@@ -443,8 +444,7 @@ char *buffer, int flags, int width, int precision, int size)
 {
 	int i, unknown_length = 0, printed_characters = -1;
 
-	format_t format_types[] =
-	{
+	format_t format_types[] ={
 		{'c', _print_char}, {'s', _print_string}, {'%', _print_percent},
 		{'i', _print_number}, {'d', _print_number}, {'b', _print_binary},
 		{'u', _print_unsigned_num}, {'o', _print_octal}, {'x', _print_hexa_decimals},
@@ -474,7 +474,6 @@ char *buffer, int flags, int width, int precision, int size)
 	}
 	return (printed_characters);
 }
-
 /**
 * get_the_precision - Computes the precision for printing
 * @format: Formatted string in which to print the arguments
@@ -660,9 +659,9 @@ int width, int precision, int size)
 		extra_character = '+';
 	else if (flags & F_SPACE)
 		extra_character = ' ';
-	return (write_a_number(ind, buffer, flags, width, precision, length, padd, extra_character));
+	return (write_a_number(ind, buffer, flags, width, precision,
+				length, padd, extra_character));
 }
-
 
 /**
 * write_a_number - Write a number using a bufffer
@@ -716,7 +715,8 @@ int prec, int length, char padd, char extra_character)
 			if (extra_character)
 				buffer[--padd_start] = extra_character;
 
-			return (write(1, &buffer[padd_start], i - padd_start) + write(1, &buffer[ind], length - (1 - padd_start)));
+			return (write(1, &buffer[padd_start], i - padd_start) +
+					write(1, &buffer[ind], length - (1 - padd_start)));
 		}
 	}
 	if (extra_character)
