@@ -20,7 +20,6 @@ long int convert_size_number(long int number, int size);
 long int convert_size_unsigned(unsigned long int number, int size);
 int _print_chr(char q);
 int _print_char(va_list typez, char *buffer, int flags, int width, int precision, int size);
-int _printf(const char *format, ...);
 void print_buffer(char *buffer, int *buffer_index);
 int _print_str(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int _print_percent(va_list typez, char *buffer, int flags, int width, int precision, int size);
@@ -44,7 +43,30 @@ int handle_number(va_list typez, char *buffer, int flags, int width, int precisi
 int write_a_number(int ind, char *buffer, int flags, int width, int precision, int length, char padd, char extra_character);
 int write_pointer(va_list typez, char *buffer, int flags, int width, int precision, int size);
 int unsigned_number(va_list typez, char *buffer, int flags, int width, int precision, int size);
-int handle_print(const char *format, int *i, va_list list, char *buffer, int flags, int width, int precision, int size);
 int is_digit(char c);
+int handle_print(const char *format, int *ind, va_list list, char *buffer,int flags, int width, int precision, int size);
+
+/**
+* struct format - Struct op
+*
+* @format: The format.
+* @fn: The function associated.
+*/
+struct format
+{
+	char format;
+	int (*fn)(va_list, char[], int, int, int, int);
+};
+/**
+* typedef struct format format_t - Struct op
+*
+* @format: The format.
+* @fm_t: The function associated.
+*/
+typedef struct format format_t;
+
+int _printf(const char *format, ...);
+int handle_print(const char *format, int *i,va_list list, char *buffer, int flags, int width, int precision, int size);
+
 
 #endif /*HEADER*/

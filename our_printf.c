@@ -418,6 +418,54 @@ int get_the_flag(const char *format, int *i)
 }
 
 /**
+* handle_print - Prints an argument depending on its type
+* @format: Formatted string in which to print the arguments.
+* @list: List of arguments to be printed.
+* @ind: ind.
+* @buffer: Buffer array to handle print.
+* @flags: Calculates active flags
+* @width: get width.
+* @precision: Precision specification
+* @size: Size specifier
+* Return: 1 or 2;
+*/
+int handle_print(const char *format, int *ind, va_list list, char *buffer,int flags, int width, int precision, int size)
+{
+	int i, unknown_length = 0, printed_characters = -1;
+
+	format_t format_types[] = 
+	{
+		{'c', _print_char}, {'s', _print_string}, {'%', _print_percent},
+		{'i', _print_number}, {'d', _print_number}, {'b', _print_binary},
+		{'u', _print_unsigned_num}, {'o', _print_octal}, {'x', _print_hexa_decimals},
+		{'X', _print_hexa_capital}, {'\0', NULL}
+	};
+	for (i = 0; format_types[i].format != '\0'; i++)
+		if (format[*ind] == format_types[i].format)
+			return (format_types[i].fn(list, buffer, flags, width, precision, size));
+	if (format_types[i].format == '\0')
+	{
+		if (format[*ind] == '\0')
+			return (-1);
+		unknown_length += write(1, "%%", 1);
+		if (format[*ind - 1] == ' ')
+			unknown_length += write(1, " ", 1);
+		else if (width)
+		{
+			--(*ind);
+			while (format[*ind] != ' ' && format[*ind] != '%')
+				--(*ind);
+			if (format[*ind] == ' ')
+				--(*ind);
+			return (1);
+		}
+		unknown_length += write(1, &format[*ind], 1);
+		return (unknown_length);
+	}
+	return (printed_characters);
+}
+
+/**
 * get_the_precision - Computes the precision for printing
 * @format: Formatted string in which to print the arguments
 * @i: List of arguments to be printed.
@@ -616,7 +664,7 @@ int write_number(int a_negative, int ind, char *buffer,int flags, int width, int
 * @extra_character: Extra char
 * Return: Number of printed chars.
 */
-int write_num(int ind, char *buffer,int flags, int width, int prec,int length, char padd, char extra_character)
+int write_a_number(int ind, char *buffer,int flags, int width, int prec,int length, char padd, char extra_character)
 {
 	int i, padd_start = 1;
 
